@@ -2,8 +2,12 @@
 
 
 
-[![Code Quality Score](https://www.code-inspector.com/project/25575/score/svg)](https://www.code-inspector.com/project/25575/status/svg)
-[![Code Grade](https://www.code-inspector.com/project/25575/score/svg)](https://www.code-inspector.com/project/25575/status/svg)
+[![Code Grade](https://www.code-inspector.com/project/25575/status/svg)](https://frontend.code-inspector.com/public/project/25575/account_rest/dashboard)
+
+
+[![Code Quality Score](https://www.code-inspector.com/project/25575/score/svg)](https://www.code-inspector.com/project/25575/score/svg)
+
+
 - [Flask] 
 - [Sql Alchemy]
 - [Twilio]
