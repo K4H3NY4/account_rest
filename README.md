@@ -1,7 +1,8 @@
 # Account Rest API
 
 
-[![Code Quality Score](https://www.code-inspector.com/project/25575/score/svg)](https://www.code-inspector.com/project/25575/status/svg)
+[![Code Quality Score](https://www.code-inspector.com/project/25575/score/svg)]
+[![Code_Quality_Status](https://www.code-inspector.com/project/25575/status/svg)]
 
 - [Flask] 
 - [Sql Alchemy]
