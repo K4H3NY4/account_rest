@@ -3,8 +3,6 @@
 
 [![Code Quality Score](https://www.code-inspector.com/project/25575/score/svg)](https://www.code-inspector.com/project/25575/status/svg)
 
-## Tech
-
 - [Flask] 
 - [Sql Alchemy]
 - [Twilio]
