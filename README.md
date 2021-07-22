@@ -38,8 +38,8 @@ python3 run app.py
 | End point | Method  | json |
 | ------ | ------ | ----------|
 | / | get | |
-| /register |post | {"first_name":"John","last_name":"",    "email":"",    "phone":"",   "password":""}|
-| /login | get | {"email":"kahenyaa@gmail.com","password":"tuntu"} |
+| /register |post | {"first_name":"","last_name":"",    "email":"",    "phone":"",   "password":""}|
+| /login | get | {"email":"","password":""} |
 | /logout | post|
 | /profile | get|
 | /change-password |put|{"new_password":"","confirm_password":""}|
