@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session ,make_response
+from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 import random
@@ -16,6 +17,13 @@ CORS(app)
 #config database
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///database.db'  
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config.update(
+PERMANENT_SESSION_LIFETIME=600,
+SESSION_COOKIE_SECURE=True,
+SESSION_COOKIE_HTTPONLY=False,
+)
+
 db = SQLAlchemy(app)
 
 app.secret_key = 'random secret key'
@@ -113,20 +121,35 @@ def login():
         user_profile = User.query.filter_by(email=email).first()
 
         if( user_profile.password == password):
-            session["user_id"] = user_profile.id
-            return 'Login successful'
+            #return str(user_profile)
+            return jsonify(id=user_profile.id,
+                           first_name=user_profile.first_name,
+                           last_name=user_profile.last_name,
+                           success=1
+                        
+            
+            )
         else:
-            return 'Invalid Password'
+            return jsonify(message='Password Error',
+                           
+                           success=0
+            
+            )
+
     except:
-        return 'Invalid Email'        
-    
+        return jsonify(message='Email Error',
+                           
+                           status=0
+            
+            )
     
 
 #user profile
 @app.route('/profile', methods=['GET'])
 def profile():
     try:
-        user_profile = User.query.get(session["user_id"])
+        user_id = request.json['user_id']
+        user_profile = User.query.get(user_id)
         #return session["user_id"]
     
         return jsonify(        
@@ -141,7 +164,8 @@ def profile():
 @app.route('/edit', methods=['PUT'])
 def edit():
     try:
-        user = User.query.get(session["user_id"])
+        user_id = request.json['user_id']
+        user = User.query.get(user_id)
         first_name = request.json['first_name']
         last_name = request.json['last_name']
         user.first_name = first_name
@@ -155,7 +179,8 @@ def edit():
 @app.route('/change-password', methods=['PUT'])
 def edit_password():
     try:
-        user = User.query.get(session["user_id"])
+        user_id = request.json['user_id']
+        user = User.query.get(user_id)
         new_password = request.json['new_password']
         confirm_password = request.json['confirm_password']
         if(new_password == confirm_password):
@@ -207,10 +232,11 @@ def add_message():
         current_time = x.strftime("%d""-""%B""-""%Y"" ""%H"":""%M")
         current_date = str(current_time)
         #def __init__(self,message,status,receiver_number,time_scheduled,created_at,user_id):
+        
         message = request.json['message']
         receiver_number = request.json['receiver_number']
         time_scheduled = request.json['time_scheduled']
-        user_id = session["user_id"]
+        user_id = request.json['user_id']
         status = 'Scheduled'
         created_at = current_date
     
@@ -223,17 +249,22 @@ def add_message():
 
 
 #display all messages
-@app.route('/messages', methods=['GET'])
+@app.route('/messages', methods=['POST'])
 def all_messages():
-   
-        user_messages = Message.query.filter_by(user_id=session["user_id"]).first()
-       
-        return jsonify(        
-            message=user_messages.message,
-            receiver_number = user_messages.receiver_number,
-            status = user_messages.status,
-            time_scheduled = user_messages.time_scheduled
-            )
+        user = request.json['user_id']
+        user_messages = Message.query.filter_by(user_id=user).all()
+        output =[]
+        for user_message in user_messages:
+            user_message_data={}
+            user_message_data['message']=user_message.message
+            user_message_data['receiver_number']=user_message.receiver_number
+            user_message_data['status']=user_message.status
+            user_message_data['time_scheduled']=user_message.time_scheduled
+            output.append(user_message_data)
+
+        return jsonify({"user_messages":output})
+
+
   
 
 #display one message
@@ -241,8 +272,8 @@ def all_messages():
 def single_message(id):
     try:
         user_messages = Message.query.get(id)
-
-        if(user_messages.user_id == int(session["user_id"])):
+        user_id = request.json['user_id']
+        if(user_messages.user_id == int(user_id)):
         
             return jsonify(        
                     message=user_messages.message,
@@ -261,8 +292,8 @@ def single_message(id):
 def delete_message(id):
     try:
         user_messages = Message.query.get(id)
-
-        if(user_messages.user_id == int(session["user_id"])):
+        user_id = request.json['user_id']
+        if(user_messages.user_id == int(user_id)):
             db.session.delete(user_messages)
             db.session.commit()
         
@@ -296,10 +327,11 @@ def change_content(id):
 @app.route('/message/<int:id>/status', methods = ['PUT'])
 def change_status(id):
     try:
+        user_id = request.json['user_id']
         user_messages = Message.query.get(id)
         status = request.json['status']
         
-        if(user_messages.user_id == int(session["user_id"])):
+        if(user_messages.user_id == int(user_id)):
             user_messages.status = status
             db.session.commit()
             
