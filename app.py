@@ -1,3 +1,4 @@
+from os import stat
 from flask import Flask, request, jsonify, session ,make_response
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
@@ -252,10 +253,68 @@ def add_message():
 @app.route('/messages', methods=['POST'])
 def all_messages():
         user = request.json['user_id']
-        user_messages = Message.query.filter_by(user_id=user).all()
+        user_messages = Message.query.filter_by(user_id=user).order_by(Message.time_scheduled).all()
         output =[]
         for user_message in user_messages:
             user_message_data={}
+            user_message_data['id']=user_message.id
+            user_message_data['message']=user_message.message
+            user_message_data['receiver_number']=user_message.receiver_number
+            user_message_data['status']=user_message.status
+            user_message_data['time_scheduled']=user_message.time_scheduled
+            output.append(user_message_data)
+
+        return jsonify({"user_messages":output})
+
+
+
+#display sent
+@app.route('/sent-messages', methods=['POST'])
+def sent_messages():
+        user = request.json['user_id']
+        user_messages = Message.query.filter_by(user_id=user,status="Sent").order_by(Message.time_scheduled).all()
+        output =[]
+        for user_message in user_messages:
+            user_message_data={}
+            user_message_data['id']=user_message.id
+            user_message_data['message']=user_message.message
+            user_message_data['receiver_number']=user_message.receiver_number
+            user_message_data['status']=user_message.status
+            user_message_data['time_scheduled']=user_message.time_scheduled
+            output.append(user_message_data)
+
+        return jsonify({"user_messages":output})
+
+
+
+#display sent
+@app.route('/canceled-messages', methods=['POST'])
+def canceled_messages():
+        user = request.json['user_id']
+        user_messages = Message.query.filter_by(user_id=user,status="canceled").order_by(Message.time_scheduled).all()
+        output =[]
+        for user_message in user_messages:
+            user_message_data={}
+            user_message_data['id']=user_message.id
+            user_message_data['message']=user_message.message
+            user_message_data['receiver_number']=user_message.receiver_number
+            user_message_data['status']=user_message.status
+            user_message_data['time_scheduled']=user_message.time_scheduled
+            output.append(user_message_data)
+
+        return jsonify({"user_messages":output})
+
+
+
+#display scheduled
+@app.route('/scheduled-messages', methods=['POST'])
+def scheduled_messages():
+        user = request.json['user_id']
+        user_messages = Message.query.filter_by(user_id=user,status="Scheduled").order_by(Message.time_scheduled).all()
+        output =[]
+        for user_message in user_messages:
+            user_message_data={}
+            user_message_data['id']=user_message.id
             user_message_data['message']=user_message.message
             user_message_data['receiver_number']=user_message.receiver_number
             user_message_data['status']=user_message.status
